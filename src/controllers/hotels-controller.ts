@@ -1,15 +1,25 @@
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import httpStatus from 'http-status';
 import { AuthenticatedRequest } from '@/middlewares';
 import hotelsService from '@/services/hotels-service';
 
 export async function getAllHotels(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+
   try {
-    const allHotels = await hotelsService.getHotels();
+    const allHotels = await hotelsService.getHotels(userId);
 
     return res.status(httpStatus.OK).send(allHotels);
   } catch (error) {
-    return res.sendStatus(httpStatus.NO_CONTENT);
+    if (error.name === 'ConflictError') {
+      return res.sendStatus(httpStatus.PAYMENT_REQUIRED);
+    }
+
+    if (error.name === 'NotFoundError') {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+
+    return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
 
