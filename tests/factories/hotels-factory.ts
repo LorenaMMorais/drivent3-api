@@ -15,7 +15,7 @@ export async function createRoom(hotelId: number) {
     data: {
       name: faker.name.findName(),
       capacity: Number(faker.random.numeric()),
-      hotelId,
+      hotelId: hotelId,
     },
   });
 }
